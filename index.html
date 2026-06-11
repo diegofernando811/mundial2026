@@ -557,14 +557,10 @@ function toggleSel2(){
 
 function calcGanancia(){
   const imp = parseFloat(document.getElementById('r-importe').value)||0;
-  const c1 = parseFloat(document.getElementById('r-cuota1').value)||0;
-  const usar2 = document.getElementById('usar-sel2').checked;
-  const c2 = usar2?(parseFloat(document.getElementById('r-cuota2').value)||0):1;
+  const cuota = parseFloat(document.getElementById('r-cuota1').value)||0;
   const prev = document.getElementById('cuota-preview');
-  if(!imp||!c1){ prev.style.display='none'; return; }
-  const cuotaTotal = usar2&&c2>0 ? c1*c2 : c1;
-  const ganancia = imp * cuotaTotal;
-  document.getElementById('prev-cuota').textContent = cuotaTotal.toFixed(2);
+  if(!imp||!cuota){ prev.style.display='none'; return; }
+  const ganancia = imp * cuota;
   document.getElementById('prev-ganancia').textContent = fmt(ganancia);
   prev.style.display='flex';
 }
@@ -600,24 +596,22 @@ function registrarApuesta(){
   const c1 = parseFloat(document.getElementById('r-cuota1').value);
   if(!local||!visit){ alert('Ingresa los equipos'); return; }
   if(!mer1){ alert('Elige la selección 1'); return; }
-  if(!c1||c1<=0){ alert('Ingresa la cuota de la selección 1'); return; }
+  if(!c1||c1<=0){ alert('Ingresa la cuota total'); return; }
   if(!importe||importe<=0){ alert('Ingresa el importe'); return; }
 
   const usar2 = document.getElementById('usar-sel2').checked;
   const mer2 = usar2?document.getElementById('r-mer2').value:'';
-  const c2 = usar2?(parseFloat(document.getElementById('r-cuota2').value)||0):0;
   if(usar2&&!mer2){ alert('Elige el mercado de la selección 2'); return; }
-  if(usar2&&(!c2||c2<=0)){ alert('Ingresa la cuota de la selección 2'); return; }
 
   const golesL = document.getElementById('r-goles-local').value;
   const golesV = document.getElementById('r-goles-visit').value;
   const corners = document.getElementById('r-corners').value;
 
-  const cuotaFinal = usar2&&c2>0 ? c1*c2 : c1;
+  const cuotaFinal = c1;
   const ganancia = importe*cuotaFinal;
 
-  const sels = [{mercado:mer1,cuota:c1,resultado:null}];
-  if(usar2&&mer2) sels.push({mercado:mer2,cuota:c2,resultado:null});
+  const sels = [{mercado:mer1,resultado:null}];
+  if(usar2&&mer2) sels.push({mercado:mer2,resultado:null});
 
   // auto-evaluar si hay marcador
   let estado = 'pendiente';
@@ -642,7 +636,7 @@ function registrarApuesta(){
 
   saveData(); renderAll();
   // limpiar form
-  ['r-local','r-visitante','r-goles-local','r-goles-visit','r-corners','r-importe','r-cuota1','r-cuota2'].forEach(id=>document.getElementById(id).value='');
+  ['r-local','r-visitante','r-goles-local','r-goles-visit','r-corners','r-importe','r-cuota1'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('r-mer1').selectedIndex=0;
   document.getElementById('r-mer2').selectedIndex=0;
   document.getElementById('usar-sel2').checked=false;
@@ -666,7 +660,7 @@ function renderLista(){
   if(!aps.length){el.innerHTML='<div class="empty"><span class="empty-icon">⚽</span>Sin apuestas en esta categoría</div>';return;}
   el.innerHTML=aps.map(a=>{
     const selsTags=a.selecciones.map(s=>`
-      <span class="sel-tag ${s.resultado==='si'?'ok':s.resultado==='no'?'fail':''}">${s.mercado} <strong>${s.cuota.toFixed(2)}</strong>${s.resultado?(s.resultado==='si'?' ✓':' ✗'):''}
+      <span class="sel-tag ${s.resultado==='si'?'ok':s.resultado==='no'?'fail':''}">${s.mercado}${s.resultado?(s.resultado==='si'?' ✓':' ✗'):''}
       </span>`).join('');
     const marcador = a.golesLocal!==null?`${a.local} ${a.golesLocal}–${a.golesVisitante} ${a.visitante}`:`${a.local} vs ${a.visitante}`;
     const neto = a.estado==='ganada'?(a.ganancia-a.importe):a.estado==='perdida'?-a.importe:0;

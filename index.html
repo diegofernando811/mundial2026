@@ -259,14 +259,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="form-row"><label>🏠 Local</label><input type="text" id="r-local" placeholder="ej: MEX" maxlength="20" style="text-transform:uppercase"></div>
         <div class="form-row"><label>✈️ Visitante</label><input type="text" id="r-visitante" placeholder="ej: RSA" maxlength="20" style="text-transform:uppercase"></div>
       </div>
-      <div class="row2">
-        <div class="form-row"><label>Goles local</label><input type="number" id="r-goles-local" placeholder="—" min="0" max="20" inputmode="numeric"></div>
-        <div class="form-row"><label>Goles visitante</label><input type="number" id="r-goles-visit" placeholder="—" min="0" max="20" inputmode="numeric"></div>
-      </div>
-      <div class="row2">
-        <div class="form-row"><label>Corners totales</label><input type="number" id="r-corners" placeholder="—" min="0" inputmode="numeric"></div>
-        <div class="form-row"><label>Importe (COP)</label><input type="number" id="r-importe" placeholder="ej: 5000" inputmode="numeric" oninput="calcGanancia()"></div>
-      </div>
+      <div class="form-row"><label>Importe (COP)</label><input type="number" id="r-importe" placeholder="ej: 5000" inputmode="numeric" oninput="calcGanancia()"></div>
     </div>
 
     <!-- SELECCION 1 -->
@@ -603,40 +596,26 @@ function registrarApuesta(){
   const mer2 = usar2?document.getElementById('r-mer2').value:'';
   if(usar2&&!mer2){ alert('Elige el mercado de la selección 2'); return; }
 
-  const golesL = document.getElementById('r-goles-local').value;
-  const golesV = document.getElementById('r-goles-visit').value;
-  const corners = document.getElementById('r-corners').value;
-
   const cuotaFinal = c1;
   const ganancia = importe*cuotaFinal;
 
   const sels = [{mercado:mer1,resultado:null}];
   if(usar2&&mer2) sels.push({mercado:mer2,resultado:null});
 
-  // auto-evaluar si hay marcador
-  let estado = 'pendiente';
-  if(golesL!==''&&golesV!==''){
-    sels.forEach(s=>{
-      const r = evalSel(s,golesL,golesV,corners);
-      s.resultado = r===null?null:(r?'si':'no');
-    });
-    estado = sels.every(s=>s.resultado==='si')?'ganada':'perdida';
-  }
-
   data.apuestas.push({
     id: Date.now().toString(),
     fecha, local, visitante:visit,
-    golesLocal: golesL!==''?parseInt(golesL):null,
-    golesVisitante: golesV!==''?parseInt(golesV):null,
-    corners: corners!==''?parseInt(corners):null,
+    golesLocal: null,
+    golesVisitante: null,
+    corners: null,
     importe, cuotaFinal, ganancia,
     selecciones: sels,
-    estado
+    estado: 'pendiente'
   });
 
   saveData(); renderAll();
   // limpiar form
-  ['r-local','r-visitante','r-goles-local','r-goles-visit','r-corners','r-importe','r-cuota1'].forEach(id=>document.getElementById(id).value='');
+  ['r-local','r-visitante','r-importe','r-cuota1'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('r-mer1').selectedIndex=0;
   document.getElementById('r-mer2').selectedIndex=0;
   document.getElementById('usar-sel2').checked=false;
@@ -683,9 +662,19 @@ function renderLista(){
             a.estado==='ganada'?'<span style="color:var(--green)">+'+fmt(neto)+'</span>':
             '<span style="color:var(--red)">'+fmt(neto)+'</span>'}
         </div>
-        ${a.estado==='pendiente'?`<div style="display:flex;gap:4px">
-          <button class="btn-result ganada" onclick="resolverApuesta('${a.id}','ganada')">✅</button>
-          <button class="btn-result perdida" onclick="resolverApuesta('${a.id}','perdida')">❌</button>
+        ${a.estado==='pendiente'?`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+            <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:3px">Goles local</label>
+              <input type="number" id="gl-${a.id}" placeholder="0" min="0" max="20" inputmode="numeric" style="width:100%;padding:7px 8px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--sky);font-family:inherit;color:var(--text)"></div>
+            <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:3px">Goles visit.</label>
+              <input type="number" id="gv-${a.id}" placeholder="0" min="0" max="20" inputmode="numeric" style="width:100%;padding:7px 8px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--sky);font-family:inherit;color:var(--text)"></div>
+            <div><label style="font-size:11px;color:var(--text3);display:block;margin-bottom:3px">Corners</label>
+              <input type="number" id="co-${a.id}" placeholder="0" min="0" inputmode="numeric" style="width:100%;padding:7px 8px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--sky);font-family:inherit;color:var(--text)"></div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <button class="btn-result ganada" style="flex:1;padding:9px" onclick="resolverConMarcador('${a.id}','ganada')">✅ Ganada</button>
+            <button class="btn-result perdida" style="flex:1;padding:9px" onclick="resolverConMarcador('${a.id}','perdida')">❌ Perdida</button>
+          </div>
         </div>`:''}
       </div>
     </div>`;
@@ -696,6 +685,29 @@ function eliminarApuesta(id){
   if(!confirm('¿Eliminar esta apuesta?')) return;
   data.apuestas=data.apuestas.filter(a=>a.id!==id);
   saveData(); renderAll();
+}
+
+function resolverConMarcador(id,estado){
+  const gl = document.getElementById('gl-'+id);
+  const gv = document.getElementById('gv-'+id);
+  const co = document.getElementById('co-'+id);
+  if(!gl||gl.value===''||gv.value===''){
+    alert('Ingresa los goles local y visitante para resolver la apuesta');return;
+  }
+  const golesL = parseInt(gl.value);
+  const golesV = parseInt(gv.value);
+  const corners = co.value!==''?parseInt(co.value):null;
+  const a = data.apuestas.find(x=>x.id===id);
+  if(!a) return;
+  a.golesLocal=golesL; a.golesVisitante=golesV; a.corners=corners;
+  a.selecciones.forEach(s=>{
+    const r = evalSel(s,String(golesL),String(golesV),corners!==null?String(corners):'');
+    s.resultado = r===null?null:(r?'si':'no');
+  });
+  a.estado = estado;
+  saveData(); renderAll();
+  showToast(estado==='ganada'?'¡Apuesta ganada! ✅':'Apuesta perdida ❌');
+  renderLista();
 }
 
 function resolverApuesta(id,estado){

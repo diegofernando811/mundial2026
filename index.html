@@ -282,7 +282,6 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 1.5 Goles</option>
             <option>Más 2.5 Goles</option>
             <option>Menos 2.5 Goles</option>
-            <option>Menos 3.5 Goles</option>
             <option>Ambos Marcan</option>
             <option>Más 6.5 Corners</option>
             <option>Más 7.5 Corners</option>
@@ -290,6 +289,7 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 9.5 Corners</option>
             <option>Gol Local</option>
             <option>Gol Visitante</option>
+            <option>Menos 3 Goles</option>
         </select>
       </div>
     </div>
@@ -312,7 +312,6 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Empate</option>
             <option>Más 1.5 Goles</option>
             <option>Más 2.5 Goles</option>
-            <option>Menos 3.5 Goles</option>
             <option>Menos 2.5 Goles</option>
             <option>Ambos Marcan</option>
             <option>Más 6.5 Corners</option>
@@ -321,6 +320,7 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 9.5 Corners</option>
             <option>Gol Local</option>
             <option>Gol Visitante</option>
+            <option>Menos 3 Goles</option>
           </select>
         </div>
       </div>
@@ -345,7 +345,6 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 1.5 Goles</option>
             <option>Más 2.5 Goles</option>
             <option>Menos 2.5 Goles</option>
-            <option>Menos 3.5 Goles</option>
             <option>Ambos Marcan</option>
             <option>Más 6.5 Corners</option>
             <option>Más 7.5 Corners</option>
@@ -353,6 +352,7 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 9.5 Corners</option>
             <option>Gol Local</option>
             <option>Gol Visitante</option>
+            <option>Menos 3 Goles</option>
           </select>
         </div>
       </div>
@@ -461,54 +461,54 @@ select option{background:#0D1A2E;color:var(--text)}
 
 <script>
 const FIFA_TEAMS = [
-  {code:'ARG',name:'Argentina'},
-  {code:'AUS',name:'Australia'},
-  {code:'BEL',name:'Bélgica'},
-  {code:'BOL',name:'Bolivia'},
-  {code:'BRA',name:'Brasil'},
-  {code:'CMR',name:'Camerún'},
+  {code:'MEX',name:'México'},
+  {code:'RSA',name:'Sudáfrica'},
+  {code:'KOR',name:'Corea del Sur'},
+  {code:'CZE',name:'Chequia (República Checa)'},
   {code:'CAN',name:'Canadá'},
-  {code:'CHI',name:'Chile'},
-  {code:'CHN',name:'China'},
-  {code:'COL',name:'Colombia'},
-  {code:'CRC',name:'Costa Rica'},
-  {code:'CIV',name:"Costa de Marfil"},
-  {code:'CRO',name:'Croacia'},
-  {code:'ECU',name:'Ecuador'},
-  {code:'EGY',name:'Egipto'},
-  {code:'SLV',name:'El Salvador'},
-  {code:'ENG',name:'Inglaterra'},
-  {code:'FRA',name:'Francia'},
+  {code:'BIH',name:'Bosnia y Herzegovina'},
+  {code:'QAT',name:'Catar'},
+  {code:'SUI',name:'Suiza'},
+  {code:'BRA',name:'Brasil'},
+  {code:'MAR',name:'Marruecos'},
+  {code:'HAI',name:'Haití'},
+  {code:'SCO',name:'Escocia'},
+  {code:'USA',name:'Estados Unidos'},
+  {code:'PAR',name:'Paraguay'},
+  {code:'AUS',name:'Australia'},
+  {code:'TUR',name:'Turquía'},
   {code:'GER',name:'Alemania'},
+  {code:'CUW',name:'Curazao'},
+  {code:'CIV',name:'Costa de Marfil'},
+  {code:'ECU',name:'Ecuador'},
+  {code:'NED',name:'Países Bajos'},
+  {code:'JPN',name:'Japón'},
+  {code:'SWE',name:'Suecia'},
+  {code:'TUN',name:'Túnez'},
+  {code:'BEL',name:'Bélgica'},
+  {code:'EGY',name:'Egipto'},
+  {code:'IRN',name:'Irán'},
+  {code:'NZL',name:'Nueva Zelanda'},
+  {code:'ESP',name:'España'},
+  {code:'CPV',name:'Cabo Verde'},
+  {code:'KSA',name:'Arabia Saudita'},
+  {code:'URU',name:'Uruguay'},
+  {code:'SEN',name:'Senegal'},
+  {code:'IRQ',name:'Irak'},
+  {code:'NOR',name:'Noruega'},
+  {code:'JOR',name:'Jordania'},
+  {code:'ARG',name:'Argentina'},
+  {code:'ALG',name:'Argelia'},
+  {code:'AUT',name:'Austria'},
+  {code:'COD',name:'RD Congo'},
+  {code:'POR',name:'Portugal'},
+  {code:'COL',name:'Colombia'},
+  {code:'UZB',name:'Uzbekistán'},
+  {code:'PAN',name:'Panamá'},
+  {code:'ENG',name:'Inglaterra'},
+  {code:'CRO',name:'Croacia'},
   {code:'GHA',name:'Ghana'},
   {code:'GRE',name:'Grecia'},
-  {code:'HND',name:'Honduras'},
-  {code:'HUN',name:'Hungría'},
-  {code:'IRN',name:'Irán'},
-  {code:'IRQ',name:'Irak'},
-  {code:'JAM',name:'Jamaica'},
-  {code:'JPN',name:'Japón'},
-  {code:'KEN',name:'Kenia'},
-  {code:'KOR',name:'Corea del Sur'},
-  {code:'MAR',name:'Marruecos'},
-  {code:'MEX',name:'México'},
-  {code:'NED',name:'Países Bajos'},
-  {code:'NGA',name:'Nigeria'},
-  {code:'NZL',name:'Nueva Zelanda'},
-  {code:'PAN',name:'Panamá'},
-  {code:'PAR',name:'Paraguay'},
-  {code:'PER',name:'Perú'},
-  {code:'POL',name:'Polonia'},
-  {code:'POR',name:'Portugal'},
-  {code:'RSA',name:'Sudáfrica'},
-  {code:'SAU',name:'Arabia Saudita'},
-  {code:'SEN',name:'Senegal'},
-  {code:'SRB',name:'Serbia'},
-  {code:'ESP',name:'España'},
-  {code:'THA',name:'Tailandia'},
-  {code:'TUN',name:'Túnez'},
-  {code:'URU',name:'Uruguay'},
-  {code:'USA',name:'Estados Unidos'},
 ];
 
 const CLIENT_ID = '186342142022-04qefg3bi476kc63r06pu59aa6lqg2u8.apps.googleusercontent.com';
@@ -522,7 +522,7 @@ let chartEvol = null, chartDias = null;
 let currentPeriod = '7d', currentFiltro = 'todas';
 let data = { apuestas: [] };
 
-const MERCADOS = ['Gana Local','Gana Visitante','Gana/Empata Local','Gana/Empata Visitante','Empate','Más 1.5 Goles','Más 2.5 Goles','Menos 2.5 Goles','Ambos Marcan','Más 7.5 Corners','Más 8.5 Corners','Más 9.5 Corners','Gol Local','Gol Visitante'];
+const MERCADOS = ['Gana Local','Gana Visitante','Gana/Empata Local','Gana/Empata Visitante','Empate','Más 1.5 Goles','Más 2.5 Goles','Menos 2.5 Goles','Ambos Marcan','Más 6.5 Corners','Más 7.5 Corners','Más 8.5 Corners','Más 9.5 Corners','Gol Local','Gol Visitante','Menos 3 Goles'];
 
 function fmt(n){ return '$'+Math.round(n).toLocaleString('es-CO'); }
 function fmtUSD(n){ return '≈ $'+((n/USD_RATE)).toFixed(1)+' USD'; }
@@ -670,7 +670,6 @@ function evalSel(sel, golesL, golesV, corners){
   if(m==='Más 1.5 Goles') return tot>1.5;
   if(m==='Más 2.5 Goles') return tot>2.5;
   if(m==='Menos 2.5 Goles') return tot<2.5;
-  if(m==='Menos 3.5 Goles') return tot<3.5;
   if(m==='Ambos Marcan') return gL>0&&gV>0;
   if(m==='Más 6.5 Corners') return c>6.5;
   if(m==='Más 7.5 Corners') return c>7.5;
@@ -678,6 +677,7 @@ function evalSel(sel, golesL, golesV, corners){
   if(m==='Más 9.5 Corners') return c>9.5;
   if(m==='Gol Local') return gL>0;
   if(m==='Gol Visitante') return gV>0;
+  if(m==='Menos 3 Goles') return tot<3;
   return null;
 }
 

@@ -44,7 +44,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .header-saldo .val.neg{color:#FCA5A5}
 .sync-row{display:flex;align-items:center;gap:6px;margin-top:8px}
 .sync-dot{width:7px;height:7px;border-radius:50%;background:#6EE7B7}
-.sync-dot.syncing{background:var(--accent);animation:pulse 1s infinite}
 .sync-dot.error{background:#FCA5A5}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .sync-lbl{font-size:11px;color:rgba(255,255,255,.6)}
@@ -194,19 +193,17 @@ select option{background:#0D1A2E;color:var(--text)}
 <div id="login-screen" class="login-wrap" style="display:none">
   <div style="text-align:center;margin-bottom:28px">
     <div style="font-size:52px;margin-bottom:6px">🏆</div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:var(--navy)">MUNDIAL 2026</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:700;color:var(--text)">MUNDIAL 2026</div>
     <div style="font-size:13px;color:var(--text2);margin-top:2px">Control de apuestas deportivas</div>
   </div>
   <div class="login-card">
     <div style="font-size:40px;margin-bottom:10px">⚽</div>
-    <h2>Conectar Google Drive</h2>
-    <p>Tus apuestas se guardarán en tu Drive y podrás acceder desde cualquier dispositivo.</p>
-    <button class="btn-google" onclick="iniciarLogin()">
-      <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#4285F4" d="M43.6 20H24v8h11.3c-1 4-4 6.9-8.3 8.3v6.9h6.7c3.9-3.6 6.2-9 6.2-15.3 0-1.4-.1-2.7-.3-3.9z"/><path fill="#34A853" d="M24 44c5.4 0 10-1.8 13.3-4.8l-6.5-5a10.7 10.7 0 0 1-16-5.6H8.2v5.2C11.5 39.4 17.4 44 24 44z"/><path fill="#FBBC05" d="M14.8 28.6a11 11 0 0 1 0-7.2V16.2H8.2a20 20 0 0 0 0 17.6l6.6-5.2z"/><path fill="#EA4335" d="M24 13.5c3 0 5.6 1 7.7 3l5.7-5.7C34 7.2 29.4 5 24 5 17.4 5 11.5 9.6 8.2 16.2l6.6 5.2c1.5-4.7 6-7.9 9.2-7.9z"/></svg>
-      Conectar con Google Drive
+    <h2>Bienvenido</h2>
+    <p>Tus apuestas se guardan automáticamente en este dispositivo. Puedes exportar un respaldo cuando quieras desde la pestaña Stats.</p>
+    <button class="btn-google" onclick="usarLocal()">
+      🚀 Comenzar
     </button>
-    <button class="btn-local" onclick="usarLocal()">📱 Usar solo en este dispositivo</button>
-    <p style="margin-top:12px;font-size:11px;color:#aaa">Solo crea <code>mundial2026_data.json</code> en tu Drive.</p>
+    <p style="margin-top:12px;font-size:11px;color:#aaa">¿Ya tienes un respaldo? Podrás importarlo después de entrar.</p>
   </div>
 </div>
 
@@ -225,7 +222,7 @@ select option{background:#0D1A2E;color:var(--text)}
     </div>
     <div class="sync-row">
       <span class="sync-dot" id="sync-dot"></span>
-      <span class="sync-lbl" id="sync-lbl">Conectado</span>
+      <span class="sync-lbl" id="sync-lbl">Guardado en este dispositivo</span>
       <span style="margin-left:auto;font-size:11px;color:rgba(255,255,255,.5)" id="header-usd"></span>
     </div>
   </div>
@@ -289,7 +286,7 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 9.5 Corners</option>
             <option>Gol Local</option>
             <option>Gol Visitante</option>
-            <option>Menos 3.5 Goles</option>
+            <option>Menos 3 Goles</option>
         </select>
       </div>
     </div>
@@ -352,7 +349,7 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 9.5 Corners</option>
             <option>Gol Local</option>
             <option>Gol Visitante</option>
-            <option>Menos 3.5 Goles</option>
+            <option>Menos 3 Goles</option>
           </select>
         </div>
       </div>
@@ -425,6 +422,25 @@ select option{background:#0D1A2E;color:var(--text)}
         Últimas 10 apuestas
       </div>
       <div class="racha-box" id="racha-visual"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Respaldo de datos
+      </div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Tus apuestas se guardan automáticamente en este dispositivo. Descarga un respaldo periódicamente o impórtalo si cambias de celular.</p>
+      <div class="row2">
+        <button class="btn-primary" style="background:var(--blue3)" onclick="exportarDatos()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar
+        </button>
+        <button class="btn-primary" style="background:#162236;border:1px solid var(--border)" onclick="importarDatos()">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Importar
+        </button>
+      </div>
+      <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="manejarImport(event)">
     </div>
   </div>
 
@@ -511,18 +527,12 @@ const FIFA_TEAMS = [
   {code:'GRE',name:'Grecia'},
 ];
 
-const CLIENT_ID = '186342142022-04qefg3bi476kc63r06pu59aa6lqg2u8.apps.googleusercontent.com';
-const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
-const FILE_NAME = 'mundial2026_data.json';
-const REDIRECT_URI = 'https://diegofernando811.github.io/mundial2026/';
+const MERCADOS = ['Gana Local','Gana Visitante','Gana/Empata Local','Gana/Empata Visitante','Empate','Más 1.5 Goles','Más 2.5 Goles','Menos 2.5 Goles','Ambos Marcan','Más 6.5 Corners','Más 7.5 Corners','Más 8.5 Corners','Más 9.5 Corners','Gol Local','Gol Visitante','Menos 3 Goles'];
+const STORAGE_KEY = 'mundial_data_v2';
 let USD_RATE = 4200;
-
-let accessToken = null, fileId = null, saveTimer = null;
 let chartEvol = null, chartDias = null;
 let currentPeriod = '7d', currentFiltro = 'todas';
 let data = { apuestas: [] };
-
-const MERCADOS = ['Gana Local','Gana Visitante','Gana/Empata Local','Gana/Empata Visitante','Empate','Más 1.5 Goles','Más 2.5 Goles','Menos 2.5 Goles','Ambos Marcan','Más 6.5 Corners','Más 7.5 Corners','Más 8.5 Corners','Más 9.5 Corners','Gol Local','Gol Visitante','Menos 3 Goles'];
 
 function fmt(n){ return '$'+Math.round(n).toLocaleString('es-CO'); }
 function fmtUSD(n){ return '≈ $'+((n/USD_RATE)).toFixed(1)+' USD'; }
@@ -533,12 +543,6 @@ function showToast(msg){
   t.textContent = msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'), 2200);
 }
-function setSyncStatus(s){
-  const dot = document.getElementById('sync-dot');
-  const lbl = document.getElementById('sync-lbl');
-  dot.className = 'sync-dot'+(s==='syncing'?' syncing':s==='error'?' error':'');
-  lbl.textContent = s==='syncing'?'Guardando...':s==='error'?'Sin conexión':'Guardado ✓';
-}
 
 async function fetchUSDRate(){
   try{
@@ -548,18 +552,25 @@ async function fetchUSDRate(){
   }catch(e){}
 }
 
-function iniciarLogin(){
-  const url = `https://accounts.google.com/o/oauth2/v2/auth`
-    +`?client_id=${encodeURIComponent(CLIENT_ID)}`
-    +`&redirect_uri=${encodeURIComponent(REDIRECT_URI)}`
-    +`&response_type=token`
-    +`&scope=${encodeURIComponent(SCOPES)}`
-    +`&prompt=consent`;
-  location.href = url;
-}
 function usarLocal(){
-  localStorage.setItem('mundial_use_local','1');
   inicializarApp();
+}
+
+function saveData(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    setSyncStatus('ok');
+  }catch(e){
+    setSyncStatus('error');
+  }
+}
+
+function setSyncStatus(s){
+  const dot = document.getElementById('sync-dot');
+  const lbl = document.getElementById('sync-lbl');
+  if(!dot||!lbl) return;
+  dot.className = 'sync-dot'+(s==='error'?' error':'');
+  lbl.textContent = s==='error'?'Error al guardar':'Guardado en este dispositivo';
 }
 
 async function inicializarApp(){
@@ -570,105 +581,60 @@ async function inicializarApp(){
   const opts = FIFA_TEAMS.map(t=>`<option value="${t.code}">${t.code} — ${t.name}</option>`).join('');
   document.getElementById('r-local').innerHTML = '<option value="">— Local —</option>' + opts;
   document.getElementById('r-visitante').innerHTML = '<option value="">— Visitante —</option>' + opts;
+
   await fetchUSDRate();
-  if(accessToken){
-    setSyncStatus('syncing');
-    await cargarDesdeDrive();
-  } else {
-    // Cargar datos locales siempre como fallback
-    const s = localStorage.getItem('mundial_data_v1');
-    if(s) try{ data=JSON.parse(s); }catch(e){}
-    const useLocal = localStorage.getItem('mundial_use_local');
-    if(useLocal){
-      setSyncStatus('error');
-      document.getElementById('sync-lbl').textContent='Local';
-    } else {
-      // Token expirado — mostrar datos locales y pedir reconexión
-      mostrarBotonReconectar();
-    }
-  }
+
+  const s = localStorage.getItem(STORAGE_KEY);
+  if(s) try{ data=JSON.parse(s); }catch(e){}
+  setSyncStatus('ok');
   renderAll();
 }
 
-async function cargarDesdeDrive(){
-  try{
-    const r = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id,name)',
-      {headers:{Authorization:'Bearer '+accessToken}});
-    if(r.status===401){
-      accessToken=null;
-      localStorage.removeItem('mundial_token');
-      localStorage.removeItem('mundial_token_exp');
-      setSyncStatus('error');
-      mostrarBotonReconectar();
-      return;
+// ===== EXPORTAR / IMPORTAR =====
+function exportarDatos(){
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mundial2026_backup_${hoy()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Respaldo descargado ✓');
+}
+
+function importarDatos(){
+  document.getElementById('import-file-input').click();
+}
+
+function manejarImport(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const imported = JSON.parse(e.target.result);
+      if(!imported.apuestas || !Array.isArray(imported.apuestas)){
+        alert('El archivo no tiene el formato correcto');
+        return;
+      }
+      if(data.apuestas.length>0){
+        if(!confirm(`Tienes ${data.apuestas.length} apuestas guardadas. ¿Reemplazar todo con el respaldo (${imported.apuestas.length} apuestas)? Esta acción no se puede deshacer.`)) return;
+      }
+      data = imported;
+      saveData();
+      renderAll();
+      renderLista();
+      renderStats();
+      renderHistorial();
+      showToast('Datos importados ✓');
+    }catch(err){
+      alert('No se pudo leer el archivo. Asegúrate de que sea un respaldo válido (.json)');
     }
-    const js = await r.json();
-    const f = js.files?.find(x=>x.name===FILE_NAME);
-    if(f){
-      fileId=f.id;
-      const r2 = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
-        {headers:{Authorization:'Bearer '+accessToken}});
-      data = await r2.json();
-    }
-    setSyncStatus('ok');
-  }catch(e){setSyncStatus('error');}
-}
-
-function mostrarBotonReconectar(){
-  // Mostrar aviso en el header
-  const syncLbl = document.getElementById('sync-lbl');
-  syncLbl.innerHTML = '<span onclick="reconectar()" style="cursor:pointer;text-decoration:underline;color:#FCA5A5">Sesión expirada — toca para reconectar</span>';
-}
-
-function reconectar(){
-  // Guardar datos locales antes de reconectar
-  saveLocal();
-  iniciarLogin();
-}
-
-async function guardarEnDrive(){
-  if(!accessToken){saveLocal();return;}
-  setSyncStatus('syncing');
-  const body = JSON.stringify(data);
-  try{
-    let resp;
-    if(fileId){
-      resp = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,
-        {method:'PATCH',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},body});
-    }else{
-      const meta = await fetch('https://www.googleapis.com/drive/v3/files',
-        {method:'POST',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
-         body:JSON.stringify({name:FILE_NAME,parents:['appDataFolder']})});
-      const mj = await meta.json(); fileId=mj.id;
-      resp = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,
-        {method:'PATCH',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},body});
-    }
-    if(resp && resp.status===401){
-      accessToken=null;
-      localStorage.removeItem('mundial_token');
-      localStorage.removeItem('mundial_token_exp');
-      saveLocal();
-      mostrarBotonReconectar();
-      return;
-    }
-    setSyncStatus('ok');
-  }catch(e){setSyncStatus('error');saveLocal();}
-}
-
-function saveLocal(){ localStorage.setItem('mundial_data_v1',JSON.stringify(data)); }
-function saveData(){
-  saveLocal();
-  if(accessToken){ clearTimeout(saveTimer); saveTimer=setTimeout(guardarEnDrive,1500); }
-}
-
-function showTab(t,el){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById('tab-'+t).classList.add('active');
-  el.classList.add('active');
-  if(t==='lista') renderLista();
-  if(t==='stats') renderStats();
-  if(t==='historial') renderHistorial();
+  };
+  reader.readAsText(file);
+  event.target.value = '';
 }
 
 function toggleSels(){
@@ -713,7 +679,7 @@ function evalSel(sel, golesL, golesV, corners){
   if(m==='Más 9.5 Corners') return c>9.5;
   if(m==='Gol Local') return gL>0;
   if(m==='Gol Visitante') return gV>0;
-  if(m==='Menos 3.5 Goles') return tot<3.5;
+  if(m==='Menos 3 Goles') return tot<3;
   return null;
 }
 
@@ -1025,30 +991,18 @@ function setPeriod(p,el){
   renderHistorial();
 }
 
-// OAuth
-const hash=location.hash;
-if(hash.includes('access_token')){
-  const params=new URLSearchParams(hash.substring(1));
-  accessToken=params.get('access_token');
-  const expiresIn = parseInt(params.get('expires_in')||'3600');
-  localStorage.setItem('mundial_token',accessToken);
-  localStorage.setItem('mundial_token_exp', Date.now() + (expiresIn-120)*1000);
-  history.replaceState(null,'',location.pathname);
-}else{
-  const s=localStorage.getItem('mundial_token');
-  const exp=parseInt(localStorage.getItem('mundial_token_exp')||'0');
-  if(s && Date.now() < exp) {
-    accessToken=s;
-  } else if(s) {
-    // Token expirado - limpiar
-    localStorage.removeItem('mundial_token');
-    localStorage.removeItem('mundial_token_exp');
-    accessToken=null;
-  }
+function showTab(t,el){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  el.classList.add('active');
+  if(t==='lista') renderLista();
+  if(t==='stats') renderStats();
+  if(t==='historial') renderHistorial();
 }
-const useLocal=localStorage.getItem('mundial_use_local');
-if(accessToken||useLocal) inicializarApp();
-else document.getElementById('login-screen').style.display='flex';
+
+// Iniciar
+document.getElementById('login-screen').style.display='flex';
 </script>
 </body>
 </html>

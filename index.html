@@ -286,7 +286,7 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 9.5 Corners</option>
             <option>Gol Local</option>
             <option>Gol Visitante</option>
-            <option>Menos 3 Goles</option>
+            <option>Menos 3.5 Goles</option>
         </select>
       </div>
     </div>
@@ -317,7 +317,7 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 9.5 Corners</option>
             <option>Gol Local</option>
             <option>Gol Visitante</option>
-            <option>Menos 3 Goles</option>
+            <option>Menos 3.5 Goles</option>
           </select>
         </div>
       </div>
@@ -349,7 +349,7 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 9.5 Corners</option>
             <option>Gol Local</option>
             <option>Gol Visitante</option>
-            <option>Menos 3 Goles</option>
+            <option>Menos 3.5 Goles</option>
           </select>
         </div>
       </div>
@@ -679,7 +679,7 @@ function evalSel(sel, golesL, golesV, corners){
   if(m==='Más 9.5 Corners') return c>9.5;
   if(m==='Gol Local') return gL>0;
   if(m==='Gol Visitante') return gV>0;
-  if(m==='Menos 3 Goles') return tot<3;
+  if(m==='Menos 3.5 Goles') return tot<3.5;
   return null;
 }
 

@@ -289,7 +289,7 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 9.5 Corners</option>
             <option>Gol Local</option>
             <option>Gol Visitante</option>
-            <option>Menos 3.5 Goles</option>
+            <option>Menos 3 Goles</option>
         </select>
       </div>
     </div>
@@ -320,7 +320,7 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 9.5 Corners</option>
             <option>Gol Local</option>
             <option>Gol Visitante</option>
-            <option>Menos 3.5 Goles</option>
+            <option>Menos 3 Goles</option>
           </select>
         </div>
       </div>
@@ -352,7 +352,7 @@ select option{background:#0D1A2E;color:var(--text)}
             <option>Más 9.5 Corners</option>
             <option>Gol Local</option>
             <option>Gol Visitante</option>
-            <option>Menos 3.5 Goles</option>
+            <option>Menos 3 Goles</option>
           </select>
         </div>
       </div>
@@ -575,10 +575,17 @@ async function inicializarApp(){
     setSyncStatus('syncing');
     await cargarDesdeDrive();
   } else {
+    // Cargar datos locales siempre como fallback
     const s = localStorage.getItem('mundial_data_v1');
     if(s) try{ data=JSON.parse(s); }catch(e){}
-    setSyncStatus('error');
-    document.getElementById('sync-lbl').textContent='Local';
+    const useLocal = localStorage.getItem('mundial_use_local');
+    if(useLocal){
+      setSyncStatus('error');
+      document.getElementById('sync-lbl').textContent='Local';
+    } else {
+      // Token expirado — mostrar datos locales y pedir reconexión
+      mostrarBotonReconectar();
+    }
   }
   renderAll();
 }
@@ -587,7 +594,14 @@ async function cargarDesdeDrive(){
   try{
     const r = await fetch('https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&fields=files(id,name)',
       {headers:{Authorization:'Bearer '+accessToken}});
-    if(r.status===401){accessToken=null;localStorage.removeItem('mundial_token');setSyncStatus('error');return;}
+    if(r.status===401){
+      accessToken=null;
+      localStorage.removeItem('mundial_token');
+      localStorage.removeItem('mundial_token_exp');
+      setSyncStatus('error');
+      mostrarBotonReconectar();
+      return;
+    }
     const js = await r.json();
     const f = js.files?.find(x=>x.name===FILE_NAME);
     if(f){
@@ -600,25 +614,47 @@ async function cargarDesdeDrive(){
   }catch(e){setSyncStatus('error');}
 }
 
+function mostrarBotonReconectar(){
+  // Mostrar aviso en el header
+  const syncLbl = document.getElementById('sync-lbl');
+  syncLbl.innerHTML = '<span onclick="reconectar()" style="cursor:pointer;text-decoration:underline;color:#FCA5A5">Sesión expirada — toca para reconectar</span>';
+}
+
+function reconectar(){
+  // Guardar datos locales antes de reconectar
+  saveLocal();
+  iniciarLogin();
+}
+
 async function guardarEnDrive(){
   if(!accessToken){saveLocal();return;}
   setSyncStatus('syncing');
   const body = JSON.stringify(data);
   try{
+    let resp;
     if(fileId){
-      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,
+      resp = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,
         {method:'PATCH',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},body});
     }else{
       const meta = await fetch('https://www.googleapis.com/drive/v3/files',
         {method:'POST',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
          body:JSON.stringify({name:FILE_NAME,parents:['appDataFolder']})});
       const mj = await meta.json(); fileId=mj.id;
-      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,
+      resp = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=media`,
         {method:'PATCH',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},body});
+    }
+    if(resp && resp.status===401){
+      accessToken=null;
+      localStorage.removeItem('mundial_token');
+      localStorage.removeItem('mundial_token_exp');
+      saveLocal();
+      mostrarBotonReconectar();
+      return;
     }
     setSyncStatus('ok');
   }catch(e){setSyncStatus('error');saveLocal();}
 }
+
 function saveLocal(){ localStorage.setItem('mundial_data_v1',JSON.stringify(data)); }
 function saveData(){
   saveLocal();
@@ -677,7 +713,7 @@ function evalSel(sel, golesL, golesV, corners){
   if(m==='Más 9.5 Corners') return c>9.5;
   if(m==='Gol Local') return gL>0;
   if(m==='Gol Visitante') return gV>0;
-  if(m==='Menos 3.5 Goles') return tot<3.5;
+  if(m==='Menos 3 Goles') return tot<3;
   return null;
 }
 
@@ -994,11 +1030,21 @@ const hash=location.hash;
 if(hash.includes('access_token')){
   const params=new URLSearchParams(hash.substring(1));
   accessToken=params.get('access_token');
+  const expiresIn = parseInt(params.get('expires_in')||'3600');
   localStorage.setItem('mundial_token',accessToken);
+  localStorage.setItem('mundial_token_exp', Date.now() + (expiresIn-120)*1000);
   history.replaceState(null,'',location.pathname);
 }else{
   const s=localStorage.getItem('mundial_token');
-  if(s) accessToken=s;
+  const exp=parseInt(localStorage.getItem('mundial_token_exp')||'0');
+  if(s && Date.now() < exp) {
+    accessToken=s;
+  } else if(s) {
+    // Token expirado - limpiar
+    localStorage.removeItem('mundial_token');
+    localStorage.removeItem('mundial_token_exp');
+    accessToken=null;
+  }
 }
 const useLocal=localStorage.getItem('mundial_use_local');
 if(accessToken||useLocal) inicializarApp();

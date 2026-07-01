@@ -183,6 +183,19 @@ select option{background:#0D1A2E;color:var(--text)}
 .btn-google:hover{background:#1E3050}
 .btn-local{width:100%;padding:11px;border:1px solid var(--border);border-radius:12px;background:transparent;font-size:13px;cursor:pointer;color:var(--text2);font-family:'Inter',sans-serif;color:#94A3B8}
 .usd-note{font-size:10px;color:var(--text3);text-align:center;margin-top:6px}
+
+/* TABLAS */
+.tbl{width:100%;border-collapse:collapse;font-size:12px;min-width:340px}
+.tbl thead tr{background:#162236}
+.tbl th{padding:8px 6px;text-align:left;color:var(--text3);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.3px;border-bottom:1px solid var(--border)}
+.tbl td{padding:8px 6px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(59,130,246,.05)}
+.tbl .roi-pos{color:var(--green);font-weight:600}
+.tbl .roi-neg{color:var(--red);font-weight:600}
+.tbl .neu{color:var(--text3)}
+.warn{color:var(--accent2)}
+.val.warn{color:var(--accent2)}
 </style>
 </head>
 <body>
@@ -240,9 +253,13 @@ select option{background:#0D1A2E;color:var(--text)}
       <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
       Stats
     </button>
+    <button class="tab" onclick="showTab('analisis',this)">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Análisis
+    </button>
     <button class="tab" onclick="showTab('historial',this)">
       <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Evolución
+      Curva
     </button>
   </div>
 
@@ -412,7 +429,6 @@ select option{background:#0D1A2E;color:var(--text)}
         <div class="sh-stat"><div class="lbl">ROI</div><div class="val" id="s-roi">0%</div></div>
       </div>
     </div>
-
     <div class="metrics">
       <div class="metric"><div class="lbl">Total apuestas</div><div class="val blue" id="s-total">0</div></div>
       <div class="metric"><div class="lbl">% Acierto</div><div class="val green" id="s-acierto">0%</div></div>
@@ -425,9 +441,14 @@ select option{background:#0D1A2E;color:var(--text)}
     <div class="card">
       <div class="card-title">
         <svg viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
-        Acierto por mercado
+        Rendimiento por mercado
       </div>
-      <div id="stats-mercados"><div class="empty">Sin datos suficientes</div></div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <table class="tbl" id="tbl-mercados">
+          <thead><tr><th>Mercado</th><th>Apr.</th><th>Acierto</th><th>Cuota media</th><th>ROI</th></tr></thead>
+          <tbody id="tbody-mercados"><tr><td colspan="5" style="text-align:center;padding:16px;color:var(--text3)">Sin datos</td></tr></tbody>
+        </table>
+      </div>
     </div>
 
     <div class="card">
@@ -443,7 +464,7 @@ select option{background:#0D1A2E;color:var(--text)}
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Respaldo de datos
       </div>
-      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Tus apuestas se guardan automáticamente en este dispositivo. Descarga un respaldo periódicamente o impórtalo si cambias de celular.</p>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px;line-height:1.5">Tus apuestas se guardan automáticamente. Exporta periódicamente como respaldo.</p>
       <div class="row2">
         <button class="btn-primary" style="background:var(--blue3)" onclick="exportarDatos()">
           <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -458,7 +479,43 @@ select option{background:#0D1A2E;color:var(--text)}
     </div>
   </div>
 
-  <!-- EVOLUCIÓN -->
+  <!-- ANÁLISIS: cuotas + historial tabla -->
+  <div class="section" id="tab-analisis">
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24"><path d="M2 20h20M5 20V10l7-7 7 7v10"/></svg>
+        Rendimiento por rango de cuotas
+      </div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <table class="tbl" id="tbl-cuotas">
+          <thead><tr><th>Rango</th><th>Apr.</th><th>ROI</th><th>Acierto</th></tr></thead>
+          <tbody id="tbody-cuotas"><tr><td colspan="4" style="text-align:center;padding:16px;color:var(--text3)">Sin datos</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/></svg>
+        Historial de apuestas
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+        <select id="filtro-equipo" onchange="renderAnalisis()" style="flex:1;font-size:12px;padding:7px 8px;border:1px solid var(--border);border-radius:8px;background:var(--sky2);color:var(--text);font-family:inherit">
+          <option value="">Todos los equipos</option>
+        </select>
+        <input type="date" id="filtro-fecha-desde" onchange="renderAnalisis()" style="flex:1;font-size:12px;padding:7px 8px;border:1px solid var(--border);border-radius:8px;background:var(--sky2);color:var(--text);font-family:inherit">
+        <input type="date" id="filtro-fecha-hasta" onchange="renderAnalisis()" style="flex:1;font-size:12px;padding:7px 8px;border:1px solid var(--border);border-radius:8px;background:var(--sky2);color:var(--text);font-family:inherit">
+      </div>
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+        <table class="tbl" id="tbl-historial">
+          <thead><tr><th>Partido</th><th>Mercados</th><th>Cuota</th><th>Res.</th><th>Neto</th><th>Goles</th><th>Corners</th></tr></thead>
+          <tbody id="tbody-historial"><tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text3)">Sin datos</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CURVA DE CAPITAL -->
   <div class="section" id="tab-historial">
     <div class="period-tabs">
       <button class="ptab active" onclick="setPeriod('7d',this)">7 días</button>
@@ -471,6 +528,23 @@ select option{background:#0D1A2E;color:var(--text)}
       <div class="metric"><div class="lbl">Neto período</div><div class="val" id="h-neto">$0</div></div>
       <div class="metric"><div class="lbl">Apuestas</div><div class="val blue" id="h-count">0</div></div>
     </div>
+
+    <!-- MÉTRICAS DE CURVA -->
+    <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Métricas de estrategia
+      </div>
+      <div class="metrics" style="margin-bottom:0">
+        <div class="metric"><div class="lbl">Drawdown máx.</div><div class="val red" id="c-drawdown">$0</div><div class="sub" id="c-drawdown-pct">0%</div></div>
+        <div class="metric"><div class="lbl">Días en recuperar</div><div class="val warn" id="c-recover">—</div></div>
+        <div class="metric"><div class="lbl">Saldo máx.</div><div class="val green" id="c-max">$0</div></div>
+        <div class="metric"><div class="lbl">Saldo mín.</div><div class="val red" id="c-min">$0</div></div>
+        <div class="metric"><div class="lbl">Máximos históricos</div><div class="val blue" id="c-peaks">0</div></div>
+        <div class="metric"><div class="lbl">Saldo actual</div><div class="val" id="c-actual">$0</div></div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-title">
         <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
@@ -895,19 +969,17 @@ function renderStats(){
   document.getElementById('s-perdidas').textContent=perdidas.length;
 
   // mejor apuesta
-  const mejorAp=ganadas.sort((a,b)=>(b.ganancia-b.importe)-(a.ganancia-a.importe))[0];
+  const mejorAp=[...ganadas].sort((a,b)=>(b.ganancia-b.importe)-(a.ganancia-a.importe))[0];
   if(mejorAp){
     document.getElementById('s-mejor').textContent=fmt(mejorAp.ganancia-mejorAp.importe);
     document.getElementById('s-mejor-desc').textContent=`${mejorAp.local} vs ${mejorAp.visitante}`;
   }
 
-  // racha
+  // racha visual
   const ultimas=data.apuestas.filter(a=>a.estado!=='pendiente').slice(-10);
   const rdiv=document.getElementById('racha-visual');
-  if(!ultimas.length){rdiv.innerHTML='<span style="font-size:12px;color:var(--text3)">Sin apuestas resueltas aún</span>';
-  }else{
-    rdiv.innerHTML=ultimas.map(a=>`<div class="racha-dot ${a.estado==='ganada'?'g':'p'}">${a.estado==='ganada'?'✓':'✗'}</div>`).join('');
-  }
+  rdiv.innerHTML=ultimas.length?ultimas.map(a=>`<div class="racha-dot ${a.estado==='ganada'?'g':'p'}">${a.estado==='ganada'?'✓':'✗'}</div>`).join(''):'<span style="font-size:12px;color:var(--text3)">Sin apuestas resueltas aún</span>';
+
   // racha actual
   const todas=[...data.apuestas].filter(a=>a.estado!=='pendiente').reverse();
   let rachaActual=0,tipoRacha='';
@@ -917,25 +989,114 @@ function renderStats(){
     document.getElementById('s-racha').textContent=`${rachaActual} ${tipoRacha==='ganada'?'✅':'❌'}`;
   }
 
-  // stats por mercado
+  // === TABLA RENDIMIENTO POR MERCADO ===
   const statsMer={};
   data.apuestas.filter(a=>a.estado!=='pendiente').forEach(a=>{
     a.selecciones.forEach(s=>{
-      if(!statsMer[s.mercado]) statsMer[s.mercado]={total:0,ok:0};
+      if(!statsMer[s.mercado]) statsMer[s.mercado]={total:0,ok:0,sumCuota:0,ganancia:0,apostado:0};
       statsMer[s.mercado].total++;
-      if(s.resultado==='si') statsMer[s.mercado].ok++;
+      statsMer[s.mercado].sumCuota+=a.cuotaFinal;
+      // asignar ganancia/apuesta proporcionalmente si hay varias selecciones
+      const proporcion = 1/a.selecciones.length;
+      statsMer[s.mercado].apostado+=a.importe*proporcion;
+      if(s.resultado==='si'){
+        statsMer[s.mercado].ok++;
+        statsMer[s.mercado].ganancia+=(a.ganancia-a.importe)*proporcion;
+      } else {
+        statsMer[s.mercado].ganancia-=a.importe*proporcion;
+      }
     });
   });
-  const smDiv=document.getElementById('stats-mercados');
   const merList=Object.entries(statsMer).sort((a,b)=>b[1].total-a[1].total);
-  if(!merList.length){smDiv.innerHTML='<div class="empty">Sin datos suficientes</div>';return;}
-  smDiv.innerHTML=merList.map(([mer,st])=>{
-    const pct=st.total>0?(st.ok/st.total*100):0;
-    return `<div class="stat-row">
-      <div class="stat-lbl">${mer}</div>
-      <div class="stat-bar-wrap"><div class="stat-bar" style="width:${pct}%"></div></div>
-      <div class="stat-val">${pct.toFixed(0)}% <span style="font-size:10px;color:var(--text3)">(${st.ok}/${st.total})</span></div>
-    </div>`;
+  const tbody=document.getElementById('tbody-mercados');
+  if(!merList.length){
+    tbody.innerHTML='<tr><td colspan="5" style="text-align:center;padding:16px;color:var(--text3)">Sin datos</td></tr>';
+  } else {
+    tbody.innerHTML=merList.map(([mer,st])=>{
+      const pct=st.total>0?(st.ok/st.total*100):0;
+      const cuotaMed=st.total>0?(st.sumCuota/st.total):0;
+      const roiMer=st.apostado>0?(st.ganancia/st.apostado*100):0;
+      return `<tr>
+        <td style="font-weight:500;color:var(--text)">${mer}</td>
+        <td>${st.ok}/${st.total}</td>
+        <td><span style="font-weight:600;color:${pct>=55?'var(--green)':pct>=40?'var(--accent2)':'var(--red)'}">${pct.toFixed(0)}%</span></td>
+        <td>${cuotaMed.toFixed(2)}</td>
+        <td class="${roiMer>=0?'roi-pos':'roi-neg'}">${roiMer>=0?'+':''}${roiMer.toFixed(0)}%</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
+function renderAnalisis(){
+  // === TABLA RENDIMIENTO POR RANGO DE CUOTAS ===
+  const rangos=[
+    {lbl:'< 1.50', test:c=>c<1.50},
+    {lbl:'1.50–1.69', test:c=>c>=1.50&&c<1.70},
+    {lbl:'1.70–1.89', test:c=>c>=1.70&&c<1.90},
+    {lbl:'1.90–2.10', test:c=>c>=1.90&&c<=2.10},
+    {lbl:'> 2.10', test:c=>c>2.10},
+  ];
+  const resueltas=data.apuestas.filter(a=>a.estado!=='pendiente');
+  const tbodyCuotas=document.getElementById('tbody-cuotas');
+  const rangoData=rangos.map(r=>{
+    const aps=resueltas.filter(a=>r.test(a.cuotaFinal));
+    const gan=aps.filter(a=>a.estado==='ganada');
+    const apostado=aps.reduce((s,a)=>s+a.importe,0);
+    const neto=gan.reduce((s,a)=>s+(a.ganancia-a.importe),0)-aps.filter(a=>a.estado==='perdida').reduce((s,a)=>s+a.importe,0);
+    const roi=apostado>0?(neto/apostado*100):null;
+    const acierto=aps.length>0?(gan.length/aps.length*100):null;
+    return {lbl:r.lbl,total:aps.length,roi,acierto};
+  }).filter(r=>r.total>0);
+
+  tbodyCuotas.innerHTML=rangoData.length?rangoData.map(r=>`<tr>
+    <td style="font-weight:500;color:var(--text)">${r.lbl}</td>
+    <td>${r.total}</td>
+    <td class="${r.roi>=0?'roi-pos':'roi-neg'}">${r.roi!==null?(r.roi>=0?'+':'')+r.roi.toFixed(0)+'%':'—'}</td>
+    <td><span style="font-weight:600;color:${r.acierto>=55?'var(--green)':r.acierto>=40?'var(--accent2)':'var(--red)'}">${r.acierto!==null?r.acierto.toFixed(0)+'%':'—'}</span></td>
+  </tr>`).join(''):'<tr><td colspan="4" style="text-align:center;padding:16px;color:var(--text3)">Sin datos</td></tr>';
+
+  // === HISTORIAL FILTRABLE ===
+  const filtroEquipo=document.getElementById('filtro-equipo').value;
+  const filtroDesde=document.getElementById('filtro-fecha-desde').value;
+  const filtroHasta=document.getElementById('filtro-fecha-hasta').value;
+
+  // Poblar select de equipos
+  const equiposSet=new Set();
+  data.apuestas.forEach(a=>{ equiposSet.add(a.local); equiposSet.add(a.visitante); });
+  const selEq=document.getElementById('filtro-equipo');
+  const currentVal=selEq.value;
+  selEq.innerHTML='<option value="">Todos los equipos</option>'+[...equiposSet].sort().map(e=>{
+    const t=FIFA_TEAMS.find(x=>x.code===e);
+    return `<option value="${e}" ${e===currentVal?'selected':''}>${e}${t?' — '+t.name:''}</option>`;
+  }).join('');
+
+  let aps=[...data.apuestas].sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.id.localeCompare(a.id));
+  if(filtroEquipo) aps=aps.filter(a=>a.local===filtroEquipo||a.visitante===filtroEquipo);
+  if(filtroDesde) aps=aps.filter(a=>a.fecha>=filtroDesde);
+  if(filtroHasta) aps=aps.filter(a=>a.fecha<=filtroHasta);
+
+  const tbodyHist=document.getElementById('tbody-historial');
+  if(!aps.length){
+    tbodyHist.innerHTML='<tr><td colspan="7" style="text-align:center;padding:16px;color:var(--text3)">Sin resultados</td></tr>';
+    return;
+  }
+  tbodyHist.innerHTML=aps.map(a=>{
+    const neto=a.estado==='ganada'?(a.ganancia-a.importe):a.estado==='perdida'?-a.importe:0;
+    const netoStr=a.estado==='pendiente'?'<span class="neu">—</span>':`<span class="${neto>=0?'roi-pos':'roi-neg'}">${neto>=0?'+':''}${fmt(neto)}</span>`;
+    const mers=a.selecciones.map(s=>`<span style="font-size:10px;white-space:nowrap;background:${s.resultado==='si'?'#064E3B':s.resultado==='no'?'#450A0A':'#162236'};color:${s.resultado==='si'?'#6EE7B7':s.resultado==='no'?'#FCA5A5':'#60A5FA'};padding:2px 5px;border-radius:4px;display:inline-block;margin:1px">${s.mercado}${s.resultado==='si'?' ✓':s.resultado==='no'?' ✗':''}</span>`).join(' ');
+    const marcador=a.golesLocal!==null?`${a.local} ${a.golesLocal}-${a.golesVisitante} ${a.visitante}`:`${a.local} vs ${a.visitante}`;
+    const goles=a.golesLocal!==null?`${a.golesLocal}-${a.golesVisitante}`:'—';
+    const corners=a.corners!==null?a.corners:'—';
+    const estadoBadge=a.estado==='ganada'?'✅':a.estado==='perdida'?'❌':'⏳';
+    return `<tr>
+      <td style="white-space:nowrap"><div style="font-weight:500;color:var(--text);font-size:11px">${marcador}</div><div style="font-size:10px;color:var(--text3)">${a.fecha}</div></td>
+      <td>${mers}</td>
+      <td style="font-weight:600">${a.cuotaFinal.toFixed(2)}</td>
+      <td>${estadoBadge}</td>
+      <td>${netoStr}</td>
+      <td style="text-align:center">${goles}</td>
+      <td style="text-align:center">${corners}</td>
+    </tr>`;
   }).join('');
 }
 
@@ -944,6 +1105,35 @@ function getFechasFiltroHist(){
   if(currentPeriod==='7d'){const d=new Date();d.setDate(d.getDate()-6);return{desde:d.toISOString().split('T')[0],hasta:h};}
   if(currentPeriod==='mes'){return{desde:h.substring(0,7)+'-01',hasta:h};}
   return{desde:'2000-01-01',hasta:'2099-12-31'};
+}
+
+function calcCurvaMetrics(){
+  const cronolog=[...data.apuestas].filter(a=>a.estado!=='pendiente')
+    .sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.id.localeCompare(b.id));
+  if(!cronolog.length) return null;
+  let acum=0, maxSaldo=-Infinity, minSaldo=Infinity;
+  let peakActual=0, drawdownMax=0, peaks=0;
+  let enDrawdown=false, fechaDrawdownIni=null, maxRecoveryDias=0;
+  const vals=[], fechas=[];
+  cronolog.forEach(a=>{
+    if(a.estado==='ganada') acum+=(a.ganancia-a.importe);
+    else acum-=a.importe;
+    vals.push(Math.round(acum));
+    fechas.push(a.fecha);
+    if(acum>maxSaldo) maxSaldo=acum;
+    if(acum<minSaldo) minSaldo=acum;
+    if(acum>peakActual){
+      if(enDrawdown&&fechaDrawdownIni){
+        const dias=Math.round((new Date(a.fecha)-new Date(fechaDrawdownIni))/(86400000));
+        if(dias>maxRecoveryDias) maxRecoveryDias=dias;
+      }
+      peakActual=acum; peaks++; enDrawdown=false; fechaDrawdownIni=null;
+    }
+    const dd=peakActual-acum;
+    if(dd>drawdownMax){ drawdownMax=dd; }
+    if(dd>0&&!enDrawdown){ enDrawdown=true; fechaDrawdownIni=a.fecha; }
+  });
+  return {maxSaldo,minSaldo,drawdownMax,peaks,maxRecoveryDias,vals,fechas,saldoActual:acum};
 }
 
 function renderHistorial(){
@@ -960,7 +1150,22 @@ function renderHistorial(){
   hn.textContent=fmt(neto);hn.className='val '+(neto>=0?'green':'red');
   document.getElementById('h-count').textContent=aps.length;
 
-  // evolución del saldo (acumulado cronológico total)
+  // MÉTRICAS DE CURVA (sobre total, no solo el período)
+  const m=calcCurvaMetrics();
+  if(m){
+    const ddPct=m.maxSaldo>0?(m.drawdownMax/m.maxSaldo*100):0;
+    document.getElementById('c-drawdown').textContent=fmt(m.drawdownMax);
+    document.getElementById('c-drawdown-pct').textContent=ddPct.toFixed(1)+'% del pico';
+    document.getElementById('c-recover').textContent=m.maxRecoveryDias>0?m.maxRecoveryDias+' días':'—';
+    document.getElementById('c-max').textContent=fmt(m.maxSaldo);
+    document.getElementById('c-min').textContent=fmt(m.minSaldo);
+    document.getElementById('c-peaks').textContent=m.peaks;
+    const cel=document.getElementById('c-actual');
+    cel.textContent=fmt(m.saldoActual);
+    cel.className='val '+(m.saldoActual>=0?'green':'red');
+  }
+
+  // evolución del saldo
   const cronolog=[...data.apuestas].filter(a=>a.estado!=='pendiente').sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.id.localeCompare(b.id));
   let acum=0;
   const evolLabels=[], evolVals=[];
@@ -973,12 +1178,10 @@ function renderHistorial(){
 
   if(chartEvol) chartEvol.destroy();
   if(evolLabels.length){
-    const colors=evolVals.map(v=>v>=0?'rgba(16,185,129,.15)':'rgba(239,68,68,.15)');
-    const borderColor=evolVals.map(v=>v>=0?'#10B981':'#EF4444');
     chartEvol=new Chart(document.getElementById('chart-evol'),{
       type:'line',
-      data:{labels:evolLabels,datasets:[{label:'Saldo',data:evolVals,borderColor:'#1A56DB',backgroundColor:'rgba(26,86,219,.08)',borderWidth:2.5,pointRadius:3,pointBackgroundColor:'#1A56DB',tension:.3,fill:true}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmt(ctx.raw)}}},scales:{x:{ticks:{font:{size:9},color:'#94A3B8',maxRotation:45,autoSkip:true,maxTicksLimit:8}},y:{ticks:{font:{size:10},color:'#94A3B8',callback:v=>fmt(v)}}}}
+      data:{labels:evolLabels,datasets:[{label:'Saldo',data:evolVals,borderColor:'#3B82F6',backgroundColor:'rgba(59,130,246,.08)',borderWidth:2.5,pointRadius:2.5,pointBackgroundColor:evolVals.map(v=>v>=0?'#10B981':'#EF4444'),tension:.3,fill:true}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmt(ctx.raw)}}},scales:{x:{ticks:{font:{size:9},color:'#94A3B8',maxRotation:45,autoSkip:true,maxTicksLimit:8}},y:{ticks:{font:{size:10},color:'#94A3B8',callback:v=>fmt(v)},grid:{color:'rgba(30,48,80,.5)'}}}},
     });
   }
 
@@ -998,7 +1201,7 @@ function renderHistorial(){
       type:'bar',
       data:{labels:diasKeys.map(f=>new Date(f+'T12:00').toLocaleDateString('es-CO',{day:'numeric',month:'short'})),
             datasets:[{label:'Neto',data:diasVals,backgroundColor:diasVals.map(v=>v>=0?'#10B981':'#EF4444'),borderRadius:5,borderSkipped:false}]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmt(ctx.raw)}}},scales:{x:{ticks:{font:{size:10},color:'#94A3B8',maxRotation:45}},y:{ticks:{font:{size:10},color:'#94A3B8',callback:v=>fmt(v)}}}}
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmt(ctx.raw)}}},scales:{x:{ticks:{font:{size:10},color:'#94A3B8',maxRotation:45}},y:{ticks:{font:{size:10},color:'#94A3B8',callback:v=>fmt(v)},grid:{color:'rgba(30,48,80,.5)'}}}}
     });
   }
 }
@@ -1017,6 +1220,7 @@ function showTab(t,el){
   el.classList.add('active');
   if(t==='lista') renderLista();
   if(t==='stats') renderStats();
+  if(t==='analisis') renderAnalisis();
   if(t==='historial') renderHistorial();
 }
 
